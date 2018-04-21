@@ -1,44 +1,1 @@
-//由于当前(2018年04月19日)官方api不支持画板属性查询，自己写个判断layer是否是画板的方法
-function isArtboard (layer) {
-    var itemIndex = layer.itemIndex;
-    try {
-        if (app.activeDocument.backgroundLayer) {
-            itemIndex --;
-        }
-    } catch (e) {
-    }
-
-    var ref = new ActionReference();
-    ref.putIndex(stringIDToTypeID("layer"), itemIndex);
-    var desp = executeActionGet(ref);
-    try {
-        return desp.getBoolean(stringIDToTypeID("artboardEnabled"));
-    } catch (e) {
-        return false;
-    }
-}
-
-//获取画板尺寸及距离整个画布左上角原点坐标
-function getArtboardBounds (artboardLayer) {
-    var originalRuler = app.preferences.rulerUnits;
-    
-    app.preferences.rulerUnits = Units.PIXELS;
-    var itemIndex = artboardLayer.itemIndex;
-    try {
-        if (app.activeDocument.backgroundLayer) {
-            itemIndex --;
-        }
-    } catch (e) {
-    }
-    var ref = new ActionReference();
-    ref.putIndex(stringIDToTypeID("layer"), itemIndex);
-    var desp = executeActionGet(ref);
-    var theBounds = desp.getObjectValue(stringIDToTypeID('bounds'));
-    var theX = theBounds.getInteger(stringIDToTypeID('left'));
-    var theY = theBounds.getInteger(stringIDToTypeID('top'));
-    var theX2 = theBounds.getInteger(stringIDToTypeID('right'));
-    var theY2 = theBounds.getInteger(stringIDToTypeID('bottom'));
-    
-    app.preferences.rulerUnits = originalRuler;
-    return [UnitValue(theX, "px"), UnitValue(theY, "px"), UnitValue(theX2, "px"), UnitValue(theY2, "px")];
-}
+﻿//由于当前(2018年04月19日)官方api不支持画板属性查询，自己写个判断layer是否是画板的方法function isArtboard (layer) {    var itemIndex = layer.itemIndex;    try {        if (app.activeDocument.backgroundLayer) {            itemIndex --;        }    } catch (e) {    }    var ref = new ActionReference();    ref.putIndex(stringIDToTypeID("layer"), itemIndex);    var desp = executeActionGet(ref);    try {        return desp.getBoolean(stringIDToTypeID("artboardEnabled"));    } catch (e) {        return false;    }}//获取画板尺寸及距离整个画布左上角原点坐标function getArtboardBounds (artboardLayer) {    var originalRuler = app.preferences.rulerUnits;        app.preferences.rulerUnits = Units.PIXELS;    var itemIndex = artboardLayer.itemIndex;    try {        if (app.activeDocument.backgroundLayer) {            itemIndex --;        }    } catch (e) {    }    var ref = new ActionReference();    ref.putIndex(stringIDToTypeID("layer"), itemIndex);    var desp = executeActionGet(ref);    var theBounds = desp.getObjectValue(stringIDToTypeID('bounds'));    var theX = theBounds.getInteger(stringIDToTypeID('left'));    var theY = theBounds.getInteger(stringIDToTypeID('top'));    var theX2 = theBounds.getInteger(stringIDToTypeID('right'));    var theY2 = theBounds.getInteger(stringIDToTypeID('bottom'));        app.preferences.rulerUnits = originalRuler;    return [UnitValue(theX, "px"), UnitValue(theY, "px"), UnitValue(theX2, "px"), UnitValue(theY2, "px")];}//单独导出一个画板，类似ps中的“文件->导出->画板至文件”的功能function exportArtboardAsPNG(artboard, exportDirPath) {    //新建一个文档，将画板图层组拷贝guoqu     var currentDoc = app.activeDocument;    var newDoc = app.documents.add (currentDoc.width, currentDoc.height, currentDoc.resolution, null, NewDocumentMode.RGB, DocumentFill.TRANSPARENT);    app.activeDocument = currentDoc;    var newArtboard = artboard.duplicate (newDoc);    app.activeDocument = newDoc;    //记录下画板的尺寸    var bounds = getArtboardBounds(newArtboard);    var tmpFilePath = exportDirPath + "/tmp.png";    //导出一个只包含画板，但尺寸仍是原始尺寸的临时图片    saveDocumentAsPNG(tmpFilePath);    newDoc.close(SaveOptions.DONOTSAVECHANGES);    //ps打开临时图片，根据画板尺寸对画板区域进行裁剪，并导出裁剪后的部分    var tmpFile = new File(tmpFilePath);    newDoc = app.open (tmpFile);    newDoc.crop(bounds);    saveDocumentAsPNG(exportDirPath+"/result.png");    tmpFile.remove();    newDoc.close(SaveOptions.DONOTSAVECHANGES);}
