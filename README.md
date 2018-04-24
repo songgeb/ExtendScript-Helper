@@ -2,6 +2,8 @@
 
 该库中代码用于开发Photoshop等Adobe系列工具的插件
 
+NOTE: 代码均基于**PhotoShop CC 2017**版本，其他版本没有验证
+
 ### artboard.jsx
 
 - 获取画板bounds
