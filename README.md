@@ -15,3 +15,7 @@ NOTE: 代码均基于**PhotoShop CC 2017**版本，其他版本没有验证
 
 - 智能对象参考点坐标
 - 旋转角度、scale
+
+### progressbar.jsx
+
+使用progressbar的坑，具体参考`progressbar.md`文件
