@@ -41,6 +41,8 @@
 
 	针对**PhotoShop CC 2017**，我查了很多动态刷新progressbar的资料，经过尝试，总是摆脱不了`app.refresh()`，否则progressbar会卡住。但这句代码很耗时间，感觉每执行一次至少1秒，所以不建议插入太多更新点。
 	
+	还有一点需要注意，关闭进度条时，只进行`window.close()`是不够的，虽然窗口关闭了，但切换到其他应用再切回ps时，进度条窗口就又出现了，我们需要将`window=null;`才可以。
+	
 	`progressbar.jsx`文件对应进度条的实现，该部分代码参考了adobe社区中牛人**DBarranca**，[地址](https://forums.adobe.com/thread/1307400)
 	
 	使用代码如下：
